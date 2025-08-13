@@ -9,9 +9,21 @@ import SwiftUI
 
 @main
 struct CoffeeLogApp: App {
+    @StateObject private var vm = CoffeeLogViewModel()
     var body: some Scene {
         WindowGroup {
-            NavigationStack { CoffeeLogView() }
+            TabView {
+                NavigationStack { CoffeeLogView() }
+                    .tabItem {
+                        Label("Logs", systemImage: "cup.and.saucer")
+                    }
+
+                NavigationStack { HistoryView() }
+                    .tabItem {
+                        Label("History", systemImage: "clock")
+                    }
+            }
+            .environmentObject(vm)
         }
     }
 }
