@@ -10,77 +10,10 @@ import SwiftUI
 struct CoffeeLogView: View {
     @StateObject private var vm = CoffeeLogViewModel()
 
-    @State private var type = ""
-    @State private var brewMethod = ""
-    @State private var rating = 3
-    @State private var gramsUsed = 15.0
-    @State private var pourTimeSeconds = 30
-    @State private var stopTime = Date()
-    @State private var notes = ""
-
-    @FocusState private var focusedField: Field?
-
-    private enum Field: Hashable {
-        case type, brewMethod, notes
-    }
+    @State private var showingAdd = false
 
     var body: some View {
         List {
-            Section("Add Coffee") {
-                TextField("Coffee type", text: $type)
-                    .textInputAutocapitalization(.words)
-                    .autocorrectionDisabled()
-                    .focused($focusedField, equals: .type)
-
-                TextField("Brew method", text: $brewMethod)
-                    .textInputAutocapitalization(.words)
-                    .autocorrectionDisabled()
-                    .focused($focusedField, equals: .brewMethod)
-
-                Stepper(value: $rating, in: 1...5) {
-                    HStack {
-                        Text("Rating")
-                        Spacer()
-                        Text("\(rating)")
-                            .monospacedDigit()
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                Stepper(value: $gramsUsed, in: 5...40, step: 0.5) {
-                    HStack {
-                        Text("Beans")
-                        Spacer()
-                        Text("\(gramsUsed, specifier: "%.1f") g")
-                            .monospacedDigit()
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                Stepper(value: $pourTimeSeconds, in: 5...300, step: 5) {
-                    HStack {
-                        Text("Pour time")
-                        Spacer()
-                        Text("\(pourTimeSeconds) s")
-                            .monospacedDigit()
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                DatePicker("Stop time", selection: $stopTime, displayedComponents: [.hourAndMinute])
-
-                TextField("Notes", text: $notes, axis: .vertical)
-                    .lineLimit(1...3)
-                    .focused($focusedField, equals: .notes)
-
-                Button(action: addCoffee) {
-                    Text("Add Coffee")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(type.isEmpty || brewMethod.isEmpty)
-            }
-
             if !vm.coffees.isEmpty {
                 Section("History") {
                     ForEach(vm.coffees) { coffee in
@@ -123,29 +56,24 @@ struct CoffeeLogView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .scrollDismissesKeyboard(.interactively)
         .navigationTitle("Coffee Log")
-        .toolbar { EditButton() }
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) { EditButton() }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showingAdd = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .accessibilityLabel("Add Coffee")
+            }
+        }
         .safeAreaInset(edge: .bottom) { Color.clear.frame(height: 0) }
-    }
-
-    private func addCoffee() {
-        vm.addCoffee(
-            type: type,
-            brewMethod: brewMethod,
-            rating: rating,
-            gramsUsed: gramsUsed,
-            pourTimeSeconds: pourTimeSeconds,
-            stopTime: stopTime,
-            notes: notes.isEmpty ? nil : notes
-        )
-        type = ""
-        brewMethod = ""
-        rating = 3
-        gramsUsed = 15.0
-        pourTimeSeconds = 30
-        stopTime = Date()
-        notes = ""
-        focusedField = nil
+        .sheet(isPresented: $showingAdd) {
+            AddCoffeeView { type, method, rating, grams, seconds, stop, notes in
+                vm.addCoffee(type: type, brewMethod: method, rating: rating, gramsUsed: grams, pourTimeSeconds: seconds, stopTime: stop, notes: notes)
+            }
+            .presentationDetents([.medium, .large])
+        }
     }
 }
