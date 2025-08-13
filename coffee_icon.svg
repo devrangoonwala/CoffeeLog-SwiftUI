@@ -1,0 +1,25 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="512" cy="512" r="512" fill="#8B4513"/>
+  
+  <!-- Coffee cup -->
+  <path d="M300 400 L300 700 Q300 750 350 750 L674 750 Q724 750 724 700 L724 400 Z" fill="#654321"/>
+  
+  <!-- Cup handle -->
+  <path d="M724 500 Q800 500 800 600 Q800 700 724 700" stroke="#654321" stroke-width="40" fill="none"/>
+  
+  <!-- Coffee liquid -->
+  <path d="M320 420 L320 680 Q320 720 360 720 L664 720 Q704 720 704 680 L704 420 Z" fill="#3E2723"/>
+  
+  <!-- Steam lines -->
+  <path d="M400 350 Q420 320 440 350" stroke="#FFFFFF" stroke-width="8" fill="none" opacity="0.7"/>
+  <path d="M480 350 Q500 320 520 350" stroke="#FFFFFF" stroke-width="8" fill="none" opacity="0.7"/>
+  <path d="M560 350 Q580 320 600 350" stroke="#FFFFFF" stroke-width="8" fill="none" opacity="0.7"/>
+  
+  <!-- Coffee bean -->
+  <ellipse cx="450" cy="550" rx="25" ry="15" fill="#2D1810" transform="rotate(45 450 550)"/>
+  <ellipse cx="550" cy="580" rx="20" ry="12" fill="#2D1810" transform="rotate(-30 550 580)"/>
+  
+  <!-- Highlight on cup -->
+  <path d="M320 420 L320 680 Q320 720 360 720 L664 720 Q704 720 704 680 L704 420 Z" fill="none" stroke="#FFFFFF" stroke-width="4" opacity="0.3"/>
+</svg>

@@ -9,177 +9,155 @@ import SwiftUI
 
 struct CoffeeLogView: View {
     @EnvironmentObject private var vm: CoffeeLogViewModel
-
-    // Inline composer state (single-screen UX)
-    @State private var showComposer = false
-    @State private var showAdvanced = false
-    @State private var type = "" // coffee name
+    
+    // Form state variables
+    @State private var coffeeName = ""
     @State private var brewMethod = ""
-    @State private var rating = 3
-    @State private var gramsUsed = 15.0
-    @State private var pourTimeSeconds = 30
-    @State private var notes = ""
+    @State private var beansWeight = 15.0
+    @State private var waterWeight = 250.0
+    @State private var grindSize = "Medium"
+    @State private var waterTemperature = 92.0
+    @State private var brewTime = 180
     @State private var origin = ""
-    @State private var coffeeType = "" // e.g., Arabica/Robusta
-    @State private var altitude = "" // meters
+    @State private var coffeeType = ""
+    @State private var altitude = ""
+    @State private var roastLevel = "Medium"
+    @State private var notes = ""
+    
+    private let grindSizes = ["Extra Fine", "Fine", "Medium-Fine", "Medium", "Medium-Coarse", "Coarse", "Extra Coarse"]
+    private let roastLevels = ["Light", "Medium-Light", "Medium", "Medium-Dark", "Dark", "Very Dark"]
 
     var body: some View {
         List {
-            // Composer section
-            Section {
-                if showComposer {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            TextField("Coffee name", text: $type)
-                                .textInputAutocapitalization(.words)
-                                .autocorrectionDisabled()
-                            Button(role: .cancel) {
-                                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                                    resetComposer()
-                                    showComposer = false
-                                }
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(.secondary)
-                            }
-                            .buttonStyle(.plain)
-                        }
-
-                        TextField("Brew method", text: $brewMethod)
-                            .textInputAutocapitalization(.words)
-                            .autocorrectionDisabled()
-
-                        // Compact rating control
-                        HStack(spacing: 8) {
-                            Text("Rating")
-                            Spacer()
-                            Picker("Rating", selection: $rating) {
-                                ForEach(1...5, id: \.self) { value in
-                                    Image(systemName: value <= rating ? "star.fill" : "star")
-                                        .tag(value)
-                                }
-                            }
-                            .pickerStyle(.segmented)
-                            .frame(maxWidth: 220)
-                        }
-
-                        VStack(alignment: .leading, spacing: 12) {
-                            // Beans amount
-                            HStack {
-                                Text("Beans")
-                                Spacer()
-                                Text("\(gramsUsed, specifier: "%.1f") g")
-                                    .monospacedDigit()
-                                    .foregroundStyle(.secondary)
-                            }
-                            Slider(value: $gramsUsed, in: 5...40, step: 0.5)
-
-                            // Pour time
-                            HStack {
-                                Text("Pour time")
-                                Spacer()
-                                Text("\(pourTimeSeconds) s")
-                                    .monospacedDigit()
-                                    .foregroundStyle(.secondary)
-                            }
-                            Slider(value: $pourTimeSeconds.doubleBinding(), in: 5...300, step: 5)
-
-                            // New fields
-                            TextField("Origin (e.g., Ethiopia)", text: $origin)
-                                .textInputAutocapitalization(.words)
-                                .autocorrectionDisabled()
-                            TextField("Type of coffee (e.g., Arabica)", text: $coffeeType)
-                                .textInputAutocapitalization(.words)
-                                .autocorrectionDisabled()
-                            TextField("Altitude (m)", text: $altitude)
-                                .keyboardType(.numberPad)
-
-                            TextField("Notes", text: $notes, axis: .vertical)
-                                .lineLimit(1...3)
-                        }
-                        .transition(.opacity.combined(with: .scale))
-
-                        Button {
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                                addCoffee()
-                            }
-                        } label: {
-                            Text("Save")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(type.isEmpty || brewMethod.isEmpty)
-                    }
-                    .padding(.vertical, 4)
-                    .transition(.asymmetric(insertion: .move(edge: .top).combined(with: .opacity),
-                                            removal: .scale.combined(with: .opacity)))
-                } else {
-                    Button {
-                        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                            showComposer = true
-                        }
-                    } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.title3)
-                            Text("Add coffee entry")
-                                .fontWeight(.semibold)
-                            Spacer()
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .contentShape(Rectangle())
-                }
+            Section("Coffee Details") {
+                TextField("Coffee Name", text: $coffeeName)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
+                
+                TextField("Brew Method", text: $brewMethod)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
             }
-
-            // History moved to History tab
+            
+            Section("Brewing Parameters") {
+                HStack {
+                    Text("Beans Weight")
+                    Spacer()
+                    Text("\(beansWeight, specifier: "%.1f") g")
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                }
+                Slider(value: $beansWeight, in: 5...50, step: 0.5)
+                
+                HStack {
+                    Text("Water Weight")
+                    Spacer()
+                    Text("\(waterWeight, specifier: "%.0f") g")
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                }
+                Slider(value: $waterWeight, in: 100...1000, step: 10)
+                
+                Picker("Grind Size", selection: $grindSize) {
+                    ForEach(grindSizes, id: \.self) { size in
+                        Text(size).tag(size)
+                    }
+                }
+                .pickerStyle(.menu)
+                
+                HStack {
+                    Text("Water Temperature")
+                    Spacer()
+                    Text("\(waterTemperature, specifier: "%.0f")°C")
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                }
+                Slider(value: $waterTemperature, in: 80...100, step: 1)
+                
+                HStack {
+                    Text("Brew Time")
+                    Spacer()
+                    Text("\(brewTime) seconds")
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                }
+                Slider(value: .constant(Double(brewTime)), in: 30...600, step: 15)
+                    .onChange(of: brewTime) { _, newValue in
+                        brewTime = Int(newValue)
+                    }
+            }
+            
+            Section("Coffee Information") {
+                TextField("Origin (e.g., Ethiopia)", text: $origin)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
+                
+                TextField("Coffee Type (e.g., Arabica)", text: $coffeeType)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
+                
+                TextField("Altitude (meters)", text: $altitude)
+                    .keyboardType(.numberPad)
+                
+                Picker("Roast Level", selection: $roastLevel) {
+                    ForEach(roastLevels, id: \.self) { level in
+                        Text(level).tag(level)
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+            
+            Section("Notes") {
+                TextField("Additional notes about this brew...", text: $notes, axis: .vertical)
+                    .lineLimit(3...6)
+            }
+            
+            Section {
+                Button {
+                    saveCoffeeLog()
+                } label: {
+                    Text("Save Coffee Log")
+                        .frame(maxWidth: .infinity)
+                        .fontWeight(.semibold)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(coffeeName.isEmpty || brewMethod.isEmpty)
+            }
         }
         .listStyle(.insetGrouped)
-        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: showComposer)
-        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: showAdvanced)
         .navigationTitle("Coffee Logs")
-        .safeAreaInset(edge: .bottom) { Color.clear.frame(height: 0) }
+        .scrollDismissesKeyboard(.interactively)
     }
-}
-
-private extension Binding where Value == Int {
-    func doubleBinding() -> Binding<Double> {
-        Binding<Double>(
-            get: { Double(wrappedValue) },
-            set: { wrappedValue = Int($0) }
-        )
-    }
-}
-
-private extension CoffeeLogView {
-    func addCoffee() {
-        let altitudeInt = Int(altitude)
+    
+    private func saveCoffeeLog() {
+        let altitudeInt = Int(altitude) ?? 0
         vm.addCoffee(
-            type: type,
+            type: coffeeName,
             brewMethod: brewMethod,
-            rating: rating,
-            gramsUsed: gramsUsed,
-            pourTimeSeconds: pourTimeSeconds,
+            rating: 3,
+            gramsUsed: beansWeight,
+            pourTimeSeconds: brewTime,
             stopTime: nil,
             notes: notes.isEmpty ? nil : notes,
             origin: origin.isEmpty ? nil : origin,
             coffeeType: coffeeType.isEmpty ? nil : coffeeType,
-            altitudeMeters: altitudeInt
+            altitudeMeters: altitudeInt == 0 ? nil : altitudeInt
         )
-        resetComposer()
-        showComposer = false
+        resetForm()
     }
-
-    func resetComposer() {
-        type = ""
+    
+    private func resetForm() {
+        coffeeName = ""
         brewMethod = ""
-        rating = 3
-        gramsUsed = 15.0
-        pourTimeSeconds = 30
-        notes = ""
+        beansWeight = 15.0
+        waterWeight = 250.0
+        grindSize = "Medium"
+        waterTemperature = 92.0
+        brewTime = 180
         origin = ""
         coffeeType = ""
         altitude = ""
-        showAdvanced = false
+        roastLevel = "Medium"
+        notes = ""
     }
 }

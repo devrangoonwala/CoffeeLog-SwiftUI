@@ -22,6 +22,11 @@ struct CoffeeLogApp: App {
                     .tabItem {
                         Label("History", systemImage: "clock")
                     }
+                
+                NavigationStack { CoffeeRatioCalculatorView() }
+                    .tabItem {
+                        Label("Calculator", systemImage: "scalemass")
+                    }
             }
             .environmentObject(vm)
         }
