@@ -22,7 +22,18 @@ class CoffeeLogViewModel: ObservableObject {
         coffees.remove(atOffsets: offsets)
     }
 
-    func addCoffee(type: String, brewMethod: String, rating: Int, gramsUsed: Double, pourTimeSeconds: Int, stopTime: Date, notes: String?) {
+    func addCoffee(
+        type: String,
+        brewMethod: String,
+        rating: Int,
+        gramsUsed: Double,
+        pourTimeSeconds: Int,
+        stopTime: Date? = nil,
+        notes: String?,
+        origin: String? = nil,
+        coffeeType: String? = nil,
+        altitudeMeters: Int? = nil
+    ) {
         let newCoffee = CoffeeEntry(
             type: type,
             brewMethod: brewMethod,
@@ -30,7 +41,10 @@ class CoffeeLogViewModel: ObservableObject {
             gramsUsed: gramsUsed,
             pourTimeSeconds: pourTimeSeconds,
             stopTime: stopTime,
-            notes: notes
+            notes: notes,
+            origin: origin,
+            coffeeType: coffeeType,
+            altitudeMeters: altitudeMeters
         )
         coffees.insert(newCoffee, at: 0)
     }

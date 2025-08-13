@@ -15,10 +15,24 @@ struct CoffeeEntry: Identifiable, Codable {
     var rating: Int
     var gramsUsed: Double
     var pourTimeSeconds: Int
-    var stopTime: Date
+    var stopTime: Date?
     var notes: String?
+    var origin: String?
+    var coffeeType: String?
+    var altitudeMeters: Int?
     
-    init(type: String, brewMethod: String, rating: Int, gramsUsed: Double, pourTimeSeconds: Int, stopTime: Date, notes: String? = nil) {
+    init(
+        type: String,
+        brewMethod: String,
+        rating: Int,
+        gramsUsed: Double,
+        pourTimeSeconds: Int,
+        stopTime: Date? = nil,
+        notes: String? = nil,
+        origin: String? = nil,
+        coffeeType: String? = nil,
+        altitudeMeters: Int? = nil
+    ) {
         self.id = UUID()
         self.date = Date()
         self.type = type
@@ -28,6 +42,9 @@ struct CoffeeEntry: Identifiable, Codable {
         self.pourTimeSeconds = pourTimeSeconds
         self.stopTime = stopTime
         self.notes = notes
+        self.origin = origin
+        self.coffeeType = coffeeType
+        self.altitudeMeters = altitudeMeters
     }
 }
 
