@@ -2,7 +2,6 @@
 
 A comprehensive iOS app built with SwiftUI for coffee enthusiasts to log their brewing experiments, calculate ratios, and track their coffee journey.
 
-![CoffeeLog App Icon](coffee_icon.svg)
 
 ## ✨ Features
 
